@@ -1,5 +1,5 @@
-// https://osoyoo.com/2019/07/30/introduction-of-osoyoo-2wd-balance-car-robot-kit/  enthält auch Link zu Schaltplänen
-// Schaltplan: https://github.com/osoyoo/Osoyoo-development-kits/blob/master/OSOYOO%202WD%20Balance%20Car%20Robot/Osoyoo%20Balance%20Car%20Robot%20digram.pdf
+// https://osoyoo.com/2019/07/30/introduction-of-osoyoo-2wd-balance-car-robot-kit/  includes a link to the schematic
+// Schematic: https://github.com/osoyoo/Osoyoo-development-kits/blob/master/OSOYOO%202WD%20Balance%20Car%20Robot/Osoyoo%20Balance%20Car%20Robot%20digram.pdf
 // Osoyoo Bluetooth module:https://osoyoo.com/2017/10/25/arduino-lesson-hc-06-bluetooth-module/
 #include <PinChangeInt.h>
 #include <MsTimer2.h>
@@ -28,13 +28,13 @@ float pwmExtreme;
 
 void setupSetSpeed(bool initial=true)
 {
-  if (initial) {  // TB6612FNGN驱动模块控制信号初始化
-    pinMode(IN1M, OUTPUT);//控制电机1的方向，01为正转，10为反转
+  if (initial) {  
+    pinMode(IN1M, OUTPUT);
     pinMode(IN2M, OUTPUT);
-    pinMode(IN3M, OUTPUT);//控制电机2的方向，01为正转，10为反转
+    pinMode(IN3M, OUTPUT);
     pinMode(IN4M, OUTPUT);
-    pinMode(PWMA, OUTPUT);//左电机PWM
-    pinMode(PWMB, OUTPUT);//右电机PWM
+    pinMode(PWMA, OUTPUT);
+    pinMode(PWMB, OUTPUT);
     pinMode(STBY, OUTPUT);//enable TB6612FNG
     //初始化电机驱动模块
     digitalWrite(IN1M, 0);
@@ -51,7 +51,7 @@ void setupSetSpeed(bool initial=true)
 int deadOffset=10; //this is about the PWM value needed to start turning the wheels
 int deadOk=2; //below this value, accept that the motors are not turning
 void setSpeedDetails(float pwm1,float pwm2,int Pin1,int Pin2,int Pin3,int Pin4,int PinPWMA,int PinPWMB)
-//globals modified: pwmExtreme. Not mission critical, accept very rare scrambled outputs (from reading bytes before/after change)
+//globals modified: pwmExtreme. Not mission critical, accept very rare scrambled outputs (from reading bytes before/during/after change)
 //depending on modified globals: deadOk, deadOffset. Not critical, todo: change to 1 byte type uint_8
 { 
   if (abs(pwmExtreme)<abs(pwm1)) pwmExtreme=pwm1;
@@ -449,7 +449,7 @@ int logCount = logLen+1;
 int logSkip = 1;
 
 float pwm1 = 0, pwm2 = 0; //just output
-enum RecordMode {OFF,DYNAMICS,TIMING,PRINTING};
+enum RecordMode {OFF,DYNAMICS,TIMING,PRINTING}; //TIMING is a deprecated measurement mode, some parts are in comments at end of code
 RecordMode recordMode=OFF;
 
 float angleFiltered; //loop output
@@ -841,6 +841,7 @@ void loop()
   }
 }
 
+//commands for re-use:
 //m10;F-1000;
 //q;F-1000;l;d500;q
 //x1;q;f-1000,500,400;l;d500;q
@@ -848,37 +849,23 @@ void loop()
 
 /* todos:
  *  the problems I want to fix: 1. unprecise positioning, 2. combine speed+rotation, 3. performance
- *  prio1: 
- *  - measure ticks for rotation
- *  - change friction logic
- *  - quick check, whether overshoot/withdraw logic helps avoid drift
- *  - is there drift for rotation? 
- *  - check which parameters matter for 
+ *  prio2: 
+ *  - check which parameters matter and then optimize for 
  *    1. reducing oscillations around 0, 
  *    2. improving target achievement precision/time. 
- *  - Optimierung remaining parameters: optimize stability, precision, speed 
- *  - target xpos,ypos,xyangle? -> no. solve RFID/magnet positioning problem. 
- *    fine-tune motion during motion? -> no, plan stop such, that a single move can fix deviations.
- *    
- *  - avoid "kink" -> always 3-phase. ok merging & refactoring of max/slopes. 30% = balancing, 45% translation, 25% rotation?
  *  - check for String mem use, try Reserve()
- *  - todo
- *  - "losrennen" bei langsamem Wegziehen -> Erkennen/Notaus? -> not a problem anymore, if mechanical brackets dont touch ground
- *  prio2:
- *  - measure 128.1
- *  - automatisches ablegen/aufstellen verbessern (Richtung) -> check parameter, geht nur per BT gut. Auch Vorbereitung = Prio2.
- *  - Messung/Nutzung spezifische Haftreibungs-Werte Motor-pwm? Messen durch händisches Halten, keine Regelung
- *  - update Kalman-Filter auf 2 dim?
- *  prio3=nicht:
- *  - fail-safe mode, dazu messung von crit th, thp -> nein, weil nicht motorisch, sondern mechanisch limitiert
- *  - Verbesserung Winkelmessung auch bei Beschleunigung
- *  - 2-Punktregler für Aufstellen aus Seitenlage (Schwingungen)
+ *  - update Kalman-Filter to full 2 dim?
+ *  prio3 = don't do:
+ *  - fail-safe mode, i.e. acting on PWM when speed or angle get close to critical. -> not main lever to improve performance 
+ *    (better optimize flow logic, delay/stabilization times, when to take 1 or 2 images...)
+ *  - Improving measurement of tilt angle, including known information on intended longitudinal acceleration
+ *  - 2 point controller to start robot from lying state (tried it early, but vibrations matter a lot)
 */
 
-/* famous bugs:
- * - recordMode==DYNAMICS  //comparison instead of assignment
+/* most painfilly sought bugs:
+ * - recordMode==DYNAMICS  //unused comparison instead of assignment
  * - tbl[3]=tbl[2] //overwriting other data at array size of 3
- * - forgetting return at end of function. Function will still return some random value, difficult to detect
+ * - forgetting return-statement at end of function. Function will still return some random value, difficult to detect
  */
 /*void measureTiming() {  //note: there can be interrupts inbetween time measurements
   logCount=0;
