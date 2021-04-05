@@ -11,3 +11,19 @@ hardware parts:
 - servo motor: https://smile.amazon.de/gp/product/B088NB5Y27/ref=ppx_yo_dt_b_asin_title_o05_s01?ie=UTF8&psc=1
 - electromagnet module: https://smile.amazon.de/gp/product/B07H3V8N2Q/ref=ppx_yo_dt_b_asin_title_o04_s00?ie=UTF8&psc=1
 plus chargers, connectors, screws, lever, ....
+
+
+--------------
+
+Hardware Changes to Osooyo balanced robot:
+
+2 segment phase detectors:
+The 2 segment phase detectors are not fully connected: only one segment is generating an interrupt, SW estimates the direction of motion based on applied SW.
+This is inaccurate around direction changes. 2 lines were added:
+- Motor 1 connector, pin 5 "M1 B" <-> Arduino digital input pin 3
+- Motor 2 connector, pin 5 "M2 B" <-> Arduino digital input pin 5
+link to original schematic: https://github.com/osoyoo/Osoyoo-development-kits/blob/master/OSOYOO%202WD%20Balance%20Car%20Robot/Osoyoo%20Balance%20Car%20Robot%20digram.pdf
+
+Power: When motors are running at full speed and then are fully reversed, the voltage drops, sometimes causing an Arduino reset. 
+This was fixed by adding a 100uF capacitors from 0V to 3.3V and a 100uF capacitor from 0V to 5V on the Arduino board.
+
