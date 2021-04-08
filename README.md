@@ -6,9 +6,11 @@ this is a project to learn about and apply various technologies:
 - A Raspberry Pi 4B as master controller, using a camera, an RFID-reader, a servo to control a mechanical lever, an electro-magnet and a network
 - An EC2 instance on AWS to which logfiles and images are uploaded
 
-high-resolution video is here: https://youtu.be/hJhErZ3bX6Q  
-plus an update with 2 tags and obstacles: https://youtu.be/Sfq0CtV01Rc  
-and something unexpected towards the end (starting at 1:05): https://youtu.be/7XMK1tC53_U
+high-resolution videos are here:
+- the initial video: https://youtu.be/hJhErZ3bX6Q  
+- plus an update with 2 tags and obstacles: https://youtu.be/Sfq0CtV01Rc  
+- and something unexpected towards the end (starting at 1:05): https://youtu.be/7XMK1tC53_U
+
 ---------------------------
 **Technology overview:**
 
