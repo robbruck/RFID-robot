@@ -7,6 +7,7 @@ this is a project to learn about and apply various technologies:
 - An EC2 instance on AWS to which logfiles and images are uploaded
 
 high-resolution video is here: https://youtu.be/hJhErZ3bX6Q
+
 plus an update with 2 tags and obstacles: https://youtu.be/Sfq0CtV01Rc
 
 ---------------------------
